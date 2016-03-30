@@ -1,0 +1,4 @@
+#!/usr/bin/env ruby
+
+require 'rtedexis'
+puts Hola.hi(ARGV[0])
