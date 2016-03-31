@@ -1,14 +1,7 @@
 require 'net/sftp'
 
 class Rtedexis::SFTP 
-	class Response
-		def result
-
-		end
-		def invalid_cellphone_number? 
-
-		end
-	end
+  attr_accessor :last_file_sended	
   def initialize(options = {})
     @config = {host: '200.41.57.106'}
     config(options)
@@ -30,12 +23,12 @@ class Rtedexis::SFTP
   private
 
   	def format_file_content(number_list, text)
-  		sended_point = 0
   		result = ""
   		number_list.each do |number|
-			while text.length > sended_point
-				result << get_operator_code(number) + ';' + get_number_without_operator_code(number) + ';' + text[sended_point, 160] + "\n"
-				sended_point += 160
+        sended_point = 0
+  			while text.length > sended_point
+  				result << get_operator_code(number) + ';' + get_number_without_operator_code(number) + ';' + text[sended_point, 160] + "\n"
+  				sended_point += 160 
 			end
 		end
 		result
@@ -64,11 +57,13 @@ class Rtedexis::SFTP
   	end
 
   	def write_file_to_sftp_server(content)
+      file_name = generate_file_name
   		Net::SFTP.start(@config[:host], @config[:username], :password => @config[:password]) do |sftp|
-  			sftp.file.open("/entrada/" + generate_file_name, "w") do |msg|
+  			sftp.file.open("/entrada/" + file_name, "w") do |msg|
   				msg.puts content
   			end
   		end
+      @last_file_sended = file_name
   	end
 
 
