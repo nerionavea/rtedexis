@@ -1,12 +1,11 @@
-require 'test/unit'
-require 'rtedexis'
+require 'test_helper'
 
 class RtedexisTest < Test::Unit::TestCase
-#   def test_send_wdsl_request
-#   	sender = Rtedexis::SOAP.new
-#   	sender.send('584125491920', 'Hi!')
-#    assert_equal  sender.last_response.http.code, 200
-#   end
+  def test_send_wdsl_request
+  	sender = Rtedexis::SOAP.new
+  	sender.send('584125491920', 'Hi!')
+   assert_equal  sender.last_response.http.code, 200
+  end
 
 
   test "on create set wsdl passport config" do
