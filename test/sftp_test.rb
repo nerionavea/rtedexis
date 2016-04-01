@@ -4,8 +4,8 @@ class RtedexisTest < Test::Unit::TestCase
   #if you want test this you must write your credentials in @config
   def setup 
     @config = {
-      username: 'uscas',
-      password: '$usC4s'
+      username: '',
+      password: ''
     }
   end
 
