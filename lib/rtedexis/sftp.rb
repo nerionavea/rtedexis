@@ -16,22 +16,28 @@ class Rtedexis::SFTP
 
   def send(number_list, text)
   	if number_list.kind_of?(Array) and !text.empty?
-  		write_file_to_sftp_server(format_file_content(number_list, text))
+      file_content = generate_file_content(number_list, text)
+  		write_file_to_sftp_server(file_content[:for_delivery])
   	end
+    Response.new(invalid_numbers: file_content[:invalid_numbers])
   end
 
   private
 
-  	def format_file_content(number_list, text)
-  		result = ""
+  	def generate_file_content(number_list, text)
+  		result = {for_delivery: String.new, invalid_numbers: Array.new}
   		number_list.each do |number|
-        sended_point = 0
-  			while text.length > sended_point
-  				result << get_operator_code(number) + ';' + get_number_without_operator_code(number) + ';' + text[sended_point, 160] + "\n"
-  				sended_point += 160 
-			end
-		end
-		result
+        if is_in_cellphone_format?(number)
+          sended_point = 0
+    			 while text.length > sended_point
+      				result[:for_delivery] << get_operator_code(number) + ';' + get_number_without_operator_code(number) + ';' + text[sended_point, 160] + "\n"
+      				sended_point += 160 
+    			 end
+         else
+           result[:invalid_numbers] << number  
+         end
+    	 end
+  		result
   	end
 
   	def get_operator_code(number)
@@ -66,5 +72,11 @@ class Rtedexis::SFTP
       @last_file_sended = file_name
   	end
 
+    def is_in_cellphone_format?(number)
+      true if is_number?(number) and (number.length == 10 or number.length == 11)
+    end
 
+    def is_number?(string)
+      true if Integer(string) rescue false
+    end
 end
