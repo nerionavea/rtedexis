@@ -43,7 +43,7 @@ You don't require to write the cellphone number with '+58' format
 For massive sms delivery with SFTP tool you could use this:
 
 ```ruby
-Rtedexis.SFTP.new(passport: 'yourpassport', password: 'yourpassword').send(['4125491920', '4168605522'], 'Text here')
+Rtedexis.SFTP.new(username: 'username', password: 'yourpassword').send(['4125491920', '4168605522'], 'Text here')
 ```
 this method recieve an array for the numbers that will delivery the SMS
 
