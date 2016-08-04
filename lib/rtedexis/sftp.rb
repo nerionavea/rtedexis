@@ -12,26 +12,32 @@ class Rtedexis::SFTP
         @config[key] = value
       end
     @config
-  end
+  end 
 
   def send(number_list, text)
   	if number_list.kind_of?(Array) and !text.empty?
       file_content = generate_file_content(number_list, text)
   		write_file_to_sftp_server(file_content[:for_delivery])
   	end
-    Response.new(invalid_numbers: file_content[:invalid_numbers])
+    Response.new(invalid_numbers: file_content[:invalid_numbers], messages_sended: file_content[:messages_sended])
+  end
+
+  def send_with_diferent_text(numbers)
+    file_content = generate_file_content_for_individual_messages(numbers)
+    write_file_to_sftp_server(file_content[:for_delivery])
   end
 
   private
 
   	def generate_file_content(number_list, text)
-  		result = {for_delivery: String.new, invalid_numbers: Array.new}
+  		result = {for_delivery: String.new, invalid_numbers: Array.new, messages_sended: 0}
   		number_list.each do |number|
         if is_in_cellphone_format?(number)
           sended_point = 0
     			 while text.length > sended_point
       				result[:for_delivery] << get_operator_code(number) + ';' + get_number_without_operator_code(number) + ';' + text[sended_point, 160] + "\n"
       				sended_point += 160 
+              result[:messages_sended] += 1
     			 end
          else
            result[:invalid_numbers] << number  
@@ -39,6 +45,23 @@ class Rtedexis::SFTP
     	 end
   		result
   	end
+
+    def generate_file_content_for_individual_messages(items)
+      result = {for_delivery: String.new, invalid_numbers: Array.new, messages_sended: 0}
+      items.each do |item|
+        if is_in_cellphone_format?(item[:number])
+          sended_point = 0
+           while item[:text].length > sended_point
+              result[:for_delivery] << get_operator_code(item[:number]) + ';' + get_number_without_operator_code(item[:number]) + ';' + item[:text][sended_point, 160] + "\n"
+              sended_point += 160 
+              result[:messages_sended] += 1 
+           end
+         else
+           result[:invalid_numbers] << item  
+         end
+       end
+      result
+    end
 
   	def get_operator_code(number)
 		if number[0] == '0'
