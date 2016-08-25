@@ -22,9 +22,9 @@ class Rtedexis::SFTP
     Response.new(invalid_numbers: file_content[:invalid_numbers], messages_sended: file_content[:messages_sended])
   end
 
-  def send_with_diferent_text(numbers)
+  def send_with_diferent_text(numbers, args = {})
     file_content = generate_file_content_for_individual_messages(numbers)
-    write_file_to_sftp_server(file_content[:for_delivery])
+    args[:filename] ? write_file_to_sftp_server(file_content[:for_delivery], filename: args[:filename]) : write_file_to_sftp_server(file_content[:for_delivery])
   end
 
   private
@@ -85,8 +85,8 @@ class Rtedexis::SFTP
   		"masivo_" + Time.now.to_i.to_s + ".txt" 
   	end
 
-  	def write_file_to_sftp_server(content)
-      file_name = generate_file_name
+  	def write_file_to_sftp_server(content, args = {})
+      args[:filename] ? file_name = args[:filename] : file_name = generate_file_name 
   		Net::SFTP.start(@config[:host], @config[:username], :password => @config[:password]) do |sftp|
   			sftp.file.open("/entrada/" + file_name, "w") do |msg|
   				msg.puts content

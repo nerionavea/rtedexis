@@ -4,8 +4,8 @@ class RtedexisTest < Test::Unit::TestCase
   #if you want test this you must write your credentials in @config
   def setup 
     @config = {
-      username: 'uscas',
-      password: '$usC4s'
+      username: '',
+      password: ''
     }
     @sender = Rtedexis::SFTP.new(host: '200.41.57.106', username: @config[:username], password: @config[:password])
   end
@@ -44,4 +44,14 @@ class RtedexisTest < Test::Unit::TestCase
     data = sftp.download!("/entrada/" + name_of_txt_file).split(/\r\n/)
     assert_equal data, ["412;5491920;ola k ase\n426;2630994;nada o ke asae\n"]
   end
+
+  test "sftp send with custom name of file" do 
+    numbers_array = [{number: '4125491920', text: 'ola k ase'}, {number: '4262630994', text: 'nada o ke asae'}]
+    response = @sender.send_with_diferent_text(numbers_array, filename: 'usuario')
+    name_of_txt_file = 'usuario'
+    sftp = Net::SFTP.start('200.41.57.106', @config[:username], :password => @config[:password]) 
+    data = sftp.download!("/entrada/" + name_of_txt_file).split(/\r\n/)
+    assert_equal data, ["412;5491920;ola k ase\n426;2630994;nada o ke asae\n"]    
+  end
+
 end
