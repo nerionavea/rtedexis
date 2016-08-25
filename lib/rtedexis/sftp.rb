@@ -14,10 +14,10 @@ class Rtedexis::SFTP
     @config
   end 
 
-  def send(number_list, text)
-  	if number_list.kind_of?(Array) and !text.empty?
-      file_content = generate_file_content(number_list, text)
-  		write_file_to_sftp_server(file_content[:for_delivery])
+  def send(args = {})
+  	if args[:numbers_list].kind_of?(Array) and !args[:text].empty?
+      file_content = generate_file_content(args[:numbers_list], args[:text])
+  		args[:filename] ? write_file_to_sftp_server(file_content[:for_delivery], filename: args[:filename]) : write_file_to_sftp_server(file_content[:for_delivery])
   	end
     Response.new(invalid_numbers: file_content[:invalid_numbers], messages_sended: file_content[:messages_sended])
   end
